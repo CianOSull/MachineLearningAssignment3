@@ -28,12 +28,16 @@ from sklearn import metrics
 # librareis might need other stuff so we make our own
 # Look up coefficients from lectures because I have no idea why it exists
 
-def preprocess():
+# Task 1
+def Preprocess():
     diamonds_df = pd.read_csv("diamonds.csv")
     
     print("======================Task1======================")
-    print("Columns: ", diamonds_df.columns)
+    # print("Columns: ", diamonds_df.columns)
     # print(diamonds_df.head())
+    # This is just a demonstration of how values can be used to make numpy arrays
+    print("Values: ", diamonds_df[['carat', 'depth', 'table']].values, type(diamonds_df[['carat', 'depth', 'table']].values))
+    print("Values: ", diamonds_df['price'].values, type(diamonds_df['price'].values))
     
     # Create a function that loads the file and extracts what 
     # types of cut qualities [1 point], colour grades [1 point], 
@@ -102,14 +106,18 @@ def preprocess():
         # Extract columns
         # df = df[['column', 'column']]
         # Add the combinations to a list of all the dfs
-        feature_df_list.append(df[['carat', 'depth', 'table']])
-        target_df_list.append(df['price'])
-
+        feature_df_list.append(df[['carat', 'depth', 'table']].values)
+        target_df_list.append(df['price'].values)
+        
     return feature_df_list, target_df_list
 
-def main():
-    feature_df_list, target_df_list = preprocess()
+# Task 1
+def ModelFunction(degree, coefficent, feature_df_list, target_df_list):
+    print("======================Task2======================")
     
+def main():
+    feature_df_list, target_df_list = Preprocess()
+    ModelFunction(3, 2, feature_df_list, target_df_list)
 
 main()
 
