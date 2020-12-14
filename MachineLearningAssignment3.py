@@ -60,6 +60,9 @@ def preprocess():
     color_list = []
     clarity_list = []
     
+    # Create a loop going over all combinations of cut, colour,
+    # and clarity [1 point] and count the number of 
+    # data-points within each subset [1 point]. 
     # This goes through each cut, color and clarity combinations
     for cut in diamonds_df['cut'].unique():
         for color in diamonds_df['color'].unique()   :
@@ -72,6 +75,8 @@ def preprocess():
                                         (diamonds_df['color'] == color) &
                                         (diamonds_df['clarity'] == clarity)])
                 
+                 # Select only the datasets containing more than 800 
+                # data-points for further processing [1 point].
                 # Only print the datapoints with 801+ values (more than 800)
                 # Also add the combinations to the list
                 if (800 < no_dp):
@@ -99,20 +104,11 @@ def preprocess():
         # Add the combinations to a list of all the dfs
         feature_df_list.append(df[['carat', 'depth', 'table']])
         target_df_list.append(df['price'])
-    
-    
-    # Create a loop going over all combinations of cut, colour,
-    # and clarity [1 point] and count the number of 
-    # data-points within each subset [1 point]. 
-    
-    # Select only the datasets containing more than 800 
-    # data-points for further processing [1 point].
 
-
-    
+    return feature_df_list, target_df_list
 
 def main():
-    preprocess()
+    feature_df_list, target_df_list = preprocess()
     
 
 main()
