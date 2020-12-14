@@ -33,7 +33,7 @@ def preprocess():
     
     print("======================Task1======================")
     print("Columns: ", diamonds_df.columns)
-    print(diamonds_df.head())
+    # print(diamonds_df.head())
     
     # Create a function that loads the file and extracts what 
     # types of cut qualities [1 point], colour grades [1 point], 
@@ -49,7 +49,16 @@ def preprocess():
     print("Clarity: ", diamonds_df['clarity'].unique())
     
     # For each combination of these cut, colour and clarity 
-    # grades extract the corresponding data-points [1 point]. 
+    # grades extract the corresponding data-points [1 point].
+    # From now on all processing will be on these subsets 
+    # corresponding to the various different grades 
+    # (e.g. Machine Learning Assignment 3: Regression & 
+    # optimisation ('Ideal', 'E', 'VS2')). 
+    
+    # Create lists taht will contain the optimal cobminations
+    cut_list = []
+    color_list = []
+    clarity_list = []
     
     # This goes through each cut, color and clarity combinations
     for cut in diamonds_df['cut'].unique():
@@ -58,26 +67,39 @@ def preprocess():
                 # Example of how to do multiple columns equaling something
                 # dataframe[ ( dataframe['column'] == value ) & ( dataframe['column'] == value ) ]
                 
-                 # This gets the number of datapoints for this combination
+                  # This gets the number of datapoints for this combination
                 no_dp = len(diamonds_df[(diamonds_df['cut'] == cut) & 
                                         (diamonds_df['color'] == color) &
                                         (diamonds_df['clarity'] == clarity)])
                 
                 # Only print the datapoints with 801+ values (more than 800)
+                # Also add the combinations to the list
                 if (800 < no_dp):
                     print(cut, " : ", color, " : ", clarity)
-                    
-     
-    # From now on all processing will be on these subsets 
-    # corresponding to the various different grades 
-    # (e.g. Machine Learning Assignment 3: Regression & 
-    # optimisation ('Ideal', 'E', 'VS2')). 
-    
+                    cut_list.append(cut)
+                    color_list.append(color)
+                    clarity_list.append(clarity)
+
     # Going grade-by-grade split the data-points into 
     # features [1 point] and targets [1 point]. 
-    
     # Use the carat, depth and table value as 
     # features and the selling price as target.
+    feature_df_list = []
+    target_df_list = []
+    
+    # Create new dataframes using the ideal combinations of lists
+    for i in range(len(cut_list)):
+        # Set up the combinations
+        df = diamonds_df[(diamonds_df['cut'] == cut_list[i]) & 
+                          (diamonds_df['color'] == color_list[i]) &
+                          (diamonds_df['clarity'] == clarity_list[i])]
+        
+        # Extract columns
+        # df = df[['column', 'column']]
+        # Add the combinations to a list of all the dfs
+        feature_df_list.append(df[['carat', 'depth', 'table']])
+        target_df_list.append(df['price'])
+    
     
     # Create a loop going over all combinations of cut, colour,
     # and clarity [1 point] and count the number of 
