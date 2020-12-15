@@ -36,8 +36,8 @@ def Preprocess():
     # print("Columns: ", diamonds_df.columns)
     # print(diamonds_df.head())
     # This is just a demonstration of how values can be used to make numpy arrays
-    print("Values: ", diamonds_df[['carat', 'depth', 'table']].values, type(diamonds_df[['carat', 'depth', 'table']].values))
-    print("Values: ", diamonds_df['price'].values, type(diamonds_df['price'].values))
+    # print("Values: ", diamonds_df[['carat', 'depth', 'table']].values, type(diamonds_df[['carat', 'depth', 'table']].values))
+    # print("Values: ", diamonds_df['price'].values, type(diamonds_df['price'].values))
     
     # Create a function that loads the file and extracts what 
     # types of cut qualities [1 point], colour grades [1 point], 
@@ -64,6 +64,9 @@ def Preprocess():
     color_list = []
     clarity_list = []
     
+    feature_df_list = []
+    target_df_list = []
+    
     # Create a loop going over all combinations of cut, colour,
     # and clarity [1 point] and count the number of 
     # data-points within each subset [1 point]. 
@@ -74,46 +77,39 @@ def Preprocess():
                 # Example of how to do multiple columns equaling something
                 # dataframe[ ( dataframe['column'] == value ) & ( dataframe['column'] == value ) ]
                 
-                  # This gets the number of datapoints for this combination
-                no_dp = len(diamonds_df[(diamonds_df['cut'] == cut) & 
-                                        (diamonds_df['color'] == color) &
-                                        (diamonds_df['clarity'] == clarity)])
+                # Create new dataframe using the combinations
+                df = diamonds_df[(diamonds_df['cut'] == cut) & 
+                                 (diamonds_df['color'] == color) &
+                                 (diamonds_df['clarity'] == clarity)]
                 
-                 # Select only the datasets containing more than 800 
+                # Select only the datasets containing more than 800 
                 # data-points for further processing [1 point].
                 # Only print the datapoints with 801+ values (more than 800)
                 # Also add the combinations to the list
-                if (800 < no_dp):
+                if (800 < len(df)):
                     print(cut, " : ", color, " : ", clarity)
-                    cut_list.append(cut)
-                    color_list.append(color)
-                    clarity_list.append(clarity)
-
-    # Going grade-by-grade split the data-points into 
-    # features [1 point] and targets [1 point]. 
-    # Use the carat, depth and table value as 
-    # features and the selling price as target.
-    feature_df_list = []
-    target_df_list = []
-    
-    # Create new dataframes using the ideal combinations of lists
-    for i in range(len(cut_list)):
-        # Set up the combinations
-        df = diamonds_df[(diamonds_df['cut'] == cut_list[i]) & 
-                          (diamonds_df['color'] == color_list[i]) &
-                          (diamonds_df['clarity'] == clarity_list[i])]
-        
-        # Extract columns
-        # df = df[['column', 'column']]
-        # Add the combinations to a list of all the dfs
-        feature_df_list.append(df[['carat', 'depth', 'table']].values)
-        target_df_list.append(df['price'].values)
+                    
+                    
+                    # Going grade-by-grade split the data-points into 
+                    # features [1 point] and targets [1 point]. 
+                    # Use the carat, depth and table value as 
+                    # features and the selling price as target.
+                    
+                    # Extract columns
+                    # df = df[['column', 'column']]
+                    # Add the combinations to a list of all the dfs
+                    feature_df_list.append(df[['carat', 'depth', 'table']].values)
+                    target_df_list.append(df['price'].values)
+                    
+    # print(feature_df_list[0])
         
     return feature_df_list, target_df_list
 
-# Task 1
+# Task 2
 def ModelFunction(degree, coefficent, feature_df_list, target_df_list):
     print("======================Task2======================")
+    
+    
     
 def main():
     feature_df_list, target_df_list = Preprocess()
