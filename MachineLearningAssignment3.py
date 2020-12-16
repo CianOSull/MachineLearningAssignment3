@@ -249,12 +249,21 @@ def main():
     # print("The best p0 for each dataset are: ", best_p0)  
     
     # Task 7
-    # plt.figure()
-    # plt.scatter(prediction, target_df_list[index][train_index], color ='g')
-    # plt.title("Scatter plot of temp vs rentals")
-    # plt.xlabel("temp")
-    # plt.ylabel("rentals")
-    # labels = ['casual', 'registered']
-    # plt.legend(labels, loc="upper left", title="Rentals")
+    # true prices and price estimates
+    # true prices on x axis
+    # price estimates on y axis
+    # If you plot this, they should be going along the diagonal
+# rather than all of the place
+    for index in range(len(best_p0)):
+        
+        prediction = calculate_poly_function(best_degrees[index], feature_df_list[index], best_p0[index])
+
+        plt.figure()
+        plt.scatter(prediction, target_df_list[index], color ='g')
+        plt.title("True Prices and Estimated Prices for Dataset " + str(index+1))
+        plt.xlabel("True Prices")
+        plt.ylabel("Price Estimates")
+        labels = ['Data Points']
+        plt.legend(labels, loc="upper left", title="Data Points")
     
 main()
