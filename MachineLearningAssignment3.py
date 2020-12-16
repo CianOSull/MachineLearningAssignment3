@@ -59,12 +59,9 @@ def Preprocess():
     # (e.g. Machine Learning Assignment 3: Regression & 
     # optimisation ('Ideal', 'E', 'VS2')). 
     
-    # Create lists taht will contain the optimal cobminations
-    cut_list = []
-    color_list = []
-    clarity_list = []
-    
+    # This list contains the feature rows for each dataset    
     feature_df_list = []
+    # This list contains the target rows for each dataset
     target_df_list = []
     
     # Create a loop going over all combinations of cut, colour,
@@ -98,9 +95,7 @@ def Preprocess():
                     # df = df[['column', 'column']]
                     # Add the combinations to a list of all the dfs
                     feature_df_list.append(df[['carat', 'depth', 'table']].values)
-                    target_df_list.append(df['price'].values)
-                    
-    # print(feature_df_list[0])
+                    target_df_list.append(df['price'].values)                
         
     return feature_df_list, target_df_list
 
@@ -113,15 +108,6 @@ def num_coefficients_3(d):
                     if i+j+k==n:
                         t = t+1
     return t
-
-# def calculate_model_function(deg,data, p):
-#     result = np.zeros(data.shape[0])    
-#     k=0
-#     for n in range(deg+1):
-#         for i in range(n+1):
-#             result += p[k]*(data[:,0]**i)*(data[:,1]**(n-i))
-#             k+=1
-#     return result
 
 def eval_poly_3(d,a,x,y,z):
     r = 0
@@ -187,23 +173,31 @@ def main():
     print("======================Task2-5======================")
     
     # Task 6
-    kf = model_selection.KFold(n_splits=2, shuffle=True)
+    # Create the k fold
+    kf = model_selection.KFold(n_splits=4, shuffle=True)
     
-    best_results = []
-    best_degrees = []
+    # This records the best p0 from the k folds
     best_p0 = []
+    # This records the best degrees for each dataset
+    best_degrees = []   
     
-    # For each dataset
+    # For loop going through the datasets
     for index in range(len(feature_df_list)):
+        # Store the best degree for each results
         best_deg_results = []
+        # Store the best p0 for each degree
         best_p0_deg_results = []
+        # This will store the best difference for deciding the best degree
         best_deg_difference = -1e-1000
         
         # for degress
         for deg in range(4):
             # K fold
+            # This stores all the mean differences in the folds
             difference_list = []
+            # This stores all the p0s in the folds
             p0_list = []
+            # This 
             best_difference = -1e-1000
             
             for train_index, test_index in kf.split(feature_df_list[index]):
@@ -213,7 +207,6 @@ def main():
                 prediction = calculate_poly_function(deg, feature_df_list[index][test_index], p0)
                 
                 # Find the mean difference between the price estimates and 
-                # difference = np.mean(prediction) - np.mean(p0)
                 difference = np.mean(target_df_list[index] - np.mean(prediction))
                 difference_list.append(difference)
                 p0_list.append(p0)
@@ -230,13 +223,10 @@ def main():
             if best_deg_difference > best_deg_results[i]:
                 best_deg_difference = best_deg_results[i]
                 
-        best_results.append(best_deg_difference)
         best_degrees.append(best_deg_results.index(best_deg_difference))
         best_p0.append(best_p0_deg_results[best_deg_results.index(best_deg_difference)])
     
-    # print(best_results)
     print("The best degrees for each dataset are: ", best_degrees)  
-    # print("The best p0 for each dataset are: ", best_p0)  
     
     # Task 7
     # true prices and price estimates
@@ -244,8 +234,6 @@ def main():
     # price estimates on y axis
     # If you plot this, they should be going along the diagonal
     # rather than all of the place
-    plt.close("all")
-    
     for index in range(len(best_p0)):
         
         prediction = calculate_poly_function(best_degrees[index], feature_df_list[index], best_p0[index])
