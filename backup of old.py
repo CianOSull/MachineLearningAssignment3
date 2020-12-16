@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  7 14:54:03 2020
+Created on Wed Dec 16 16:13:06 2020
 
 @author: Cian
 """
+
+
+
 
 import pandas as pd
 import numpy as np
@@ -104,6 +107,8 @@ def Preprocess():
         
     return feature_df_list, target_df_list
 
+# Task 2
+# Example coefficants of 3 from lab 9
 def num_coefficients_3(d):
     t = 0
     for n in range(d+1):
@@ -114,16 +119,11 @@ def num_coefficients_3(d):
                         t = t+1
     return t
 
-# def calculate_model_function(deg,data, p):
-#     result = np.zeros(data.shape[0])    
-#     k=0
-#     for n in range(deg+1):
-#         for i in range(n+1):
-#             result += p[k]*(data[:,0]**i)*(data[:,1]**(n-i))
-#             k+=1
-#     return result
-
-def eval_poly_3(d,a,x,y,z):
+# polynomial example of 3 from lab 9
+# This does the prediction
+# P is parameter vector
+def calculate_model_function(d, a, data):    
+    print(data)
     r = 0
     t = 0
     for n in range(d+1):
@@ -131,36 +131,29 @@ def eval_poly_3(d,a,x,y,z):
             for j in range(n+1):
                 for k in range(n+1):
                     if i+j+k==n:
-                        r += a[t]*(x**i)*(y**j)*(z**k)
+                        # r += a[t]*(x**i)*(y**j)*(z**k)
+                        # r += parameter_vector[t] * (feature_points[:, 0]  i) * (feature_points[:, 1]  j) * (feature_points[:, 2] ** k)
+                       
+                        r += a[t]*(data[:,0]**i)*(data[:,1]**j)*(data[:,2]**k)
+                        # p[k]*(data[:,0]**i)*(data[:,1]**(n-i))
                         t = t+1
+   
     return r
-
-# P is parameter vector
-def calculate_poly_function(deg, data, p):
-    r = 0
-    t = 0
-    for n in range(deg+1):
-        for i in range(n+1):
-            for j in range(n+1):
-                for k in range(n+1):
-                    if i+j+k==n:
-                        r += p[t]*(data[:,0]**i)*(data[:,1]**j)*(data[:,2]**k)
-                        t = t+1
-    return r
-    
 
 def linearize(deg,data, p0):
-    f0 = calculate_poly_function(deg,data,p0)
+    f0 = calculate_model_function(deg, p0, data)
     J = np.zeros((len(f0), len(p0)))
     epsilon = 1e-6
     for i in range(len(p0)):
         p0[i] += epsilon
-        fi = calculate_poly_function(deg,data,p0)
+        fi = calculate_model_function(deg, p0, data)
         p0[i] -= epsilon
         di = (fi - f0)/epsilon
         J[:,i] = di
     return f0,J
-    
+
+# Task 4
+# J is the jackovian matrix
 def calculate_update(y,f0,J):
     l=1e-2
     N = np.matmul(J.T,J) + l*np.eye(J.shape[1])
@@ -169,25 +162,57 @@ def calculate_update(y,f0,J):
     dp = np.linalg.solve(N,n)       
     return dp
 
-def regression(data, target):
-    max_iter = 10
+
+# Task 5 
+def regression(degrees, data, target):
+    max_iter = 1
     for deg in range(5):
         p0 = np.zeros(num_coefficients_3(deg))
         for i in range(max_iter):
-            f0,J = linearize(deg,data, p0)
-            dp = calculate_update(target,f0,J)
-            p0 += dp
+            f0,J = linearize(deg, p0, data)
+            dp = calculate_update(f0, target, J)
+            # print("regression: p0\n", p0, "\n")
+            # print("regression: dp\n", dp, "\n")
+            # p0 += dp
     
     return p0
-
+   
+# Task 7
+# true prices and price estimates
+# true prices on x axis
+# price estimates on y axis
+# If you plot this, they should be going along the diagonal
+# rather than all of the place    
 
 def main():
     feature_df_list, target_df_list = Preprocess()
     
-    # Task 2 on Wards
-    print("======================Task2-5======================")
+    # print(feature_df_list[0])
+    # print("Column1: ", feature_df_list[0][0])
+    # print("Value1: ", feature_df_list[0][0][0])
+    # Seperate them, each in lsit is a unique dataset
+    # data = feature_df_list[0]
+
+    # Task 6
+    kf = model_selection.KFold(n_splits=4, shuffle=True)
     
-    p0 = regression(feature_df_list[0], target_df_list[0])
-    print(p0)
+    for index in range(len(feature_df_list)):
+        for train_index, test_index in kf.split(feature_df_list[index]):
+            # print(feature_df_list[index][train_index])
+            # print(feature_df_list[index][train_index])
+            
+            p0 = regression(4, feature_df_list[0][train_index], target_df_list[index][train_index])
+            
+            
+            # print(p0)
+            # Only do it for one of the datasets for testing
+            break
+        break
+    
+    # def calculate_model_function(deg, paramaterVector, column1,column2,column3):
+    
+    # calculate_model_function(3, , feature_df_list[0][0][0], feature_df_list[0][0][1], feature_df_list[0][0][2])
     
 main()
+
+
