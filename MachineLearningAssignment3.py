@@ -197,33 +197,46 @@ def main():
             difference_list = []
             # This stores all the p0s in the folds
             p0_list = []
-            # This 
+            # This will store the best difference for deciding the best fold
             best_difference = -1e-1000
             
             for train_index, test_index in kf.split(feature_df_list[index]):
-    
+                
+                # Call the regression function and create a model
                 p0 = regression(deg, feature_df_list[index][train_index], target_df_list[index][train_index])
                 
+                # Make predictions on teh test indexes
                 prediction = calculate_poly_function(deg, feature_df_list[index][test_index], p0)
                 
-                # Find the mean difference between the price estimates and 
+                # Find the mean difference between the price estimates and actual prices
                 difference = np.mean(target_df_list[index] - np.mean(prediction))
+                
+                # Append the difference of each fold to the list
                 difference_list.append(difference)
+                
+                # Append the parameter vector of each fold to the list
                 p0_list.append(p0)
-
-                
-            for i in range(len(difference_list)):
-                if best_difference > difference_list[i]:
-                    best_difference = difference_list[i]
-                    
-            best_deg_results.append(best_difference)
-            best_p0_deg_results.append(p0_list[difference_list.index(best_difference)])
             
+            # Find the best difference among the folds
+            for i in range(len(difference_list)):
+                if best_difference < difference_list[i]:
+                    best_difference = difference_list[i]
+            
+            # Store the best difference found for this degree in the list
+            best_deg_results.append(best_difference)
+            
+            # Store the best parameter vectors for this degree in the list
+            best_p0_deg_results.append(p0_list[difference_list.index(best_difference)])
+        
+        # Of the degrees, find the one with the best result
         for i in range(len(best_deg_results)):
-            if best_deg_difference > best_deg_results[i]:
+            if best_deg_difference < best_deg_results[i]:
                 best_deg_difference = best_deg_results[i]
-                
+        
+        # Store the best degree found in the list
         best_degrees.append(best_deg_results.index(best_deg_difference))
+        
+        # Store the best parameter vectors found in the list
         best_p0.append(best_p0_deg_results[best_deg_results.index(best_deg_difference)])
     
     print("The best degrees for each dataset are: ", best_degrees)  
@@ -236,14 +249,16 @@ def main():
     # rather than all of the place
     for index in range(len(best_p0)):
         
+        # Make predictions on the all of the features diamonds
         prediction = calculate_poly_function(best_degrees[index], feature_df_list[index], best_p0[index])
 
         plt.figure()
-        plt.scatter(prediction, target_df_list[index], color ='g')
+        # Make a scatter plot of true prices again price esitmates
+        plt.scatter(target_df_list[index], prediction, color ='g')
         plt.title("True Prices and Estimated Prices for Dataset " + str(index+1))
         plt.xlabel("True Prices")
         plt.ylabel("Price Estimates")
-        labels = ['Data Points']
-        plt.legend(labels, loc="upper left", title="Data Points")
+        labels = ['Prices']
+        plt.legend(labels, loc="upper left", title="Estiamte v Actual")
     
 main()
