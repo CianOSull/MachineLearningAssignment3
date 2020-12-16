@@ -196,12 +196,14 @@ def main():
     # For each dataset
     for index in range(len(feature_df_list)):
         best_deg_results = []
+        best_p0_deg_results = []
         best_deg_difference = -1e-1000
         
         # for degress
         for deg in range(4):
             # K fold
             difference_list = []
+            p0_list = []
             best_difference = -1e-1000
             
             for train_index, test_index in kf.split(feature_df_list[index]):
@@ -215,6 +217,7 @@ def main():
                 difference = np.mean(prediction) - np.mean(p0)
                 # print(difference)
                 difference_list.append(difference)
+                p0_list.append(p0)
                 
                 # break
                 
@@ -223,20 +226,27 @@ def main():
                     best_difference = difference_list[i]
             # print(difference_list)
             best_deg_results.append(best_difference)
+            # print(p0_list)
+            # print(best_difference)
+            # print(p0_list[difference_list.index(best_difference)])
+            best_p0_deg_results.append(p0_list[difference_list.index(best_difference)])
+            # print(best_p0_deg_results)
             # break
             
         for i in range(len(best_deg_results)):
             if best_deg_difference < best_deg_results[i]:
                 best_deg_difference = best_deg_results[i]
-        print("Best Degree: ", best_deg_results.index(best_deg_difference))
+        # print("Best Degree: ", best_deg_results.index(best_deg_difference))
         # print(best_deg_results)
         # print(best_deg_difference)
         best_results.append(best_deg_difference)
         best_degrees.append(best_deg_results.index(best_deg_difference))
+        # p0_list[difference_list.index(best_difference)]
+        best_p0.append(best_p0_deg_results[best_deg_results.index(best_deg_difference)])
     
     # print(best_results)
-    print("The best degrees for each dataset are: ", best_degrees)    
-    
+    print("The best degrees for each dataset are: ", best_degrees)  
+    # print("The best p0 for each dataset are: ", best_p0)  
     
     # Task 7
     # plt.figure()
