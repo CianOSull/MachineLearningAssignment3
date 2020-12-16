@@ -186,39 +186,65 @@ def main():
     # Task 2 on Wards
     print("======================Task2-5======================")
     
-    # p0 = regression(feature_df_list[0], target_df_list[0])
-    # print(p0)
-    
     # Task 6
     kf = model_selection.KFold(n_splits=2, shuffle=True)
     
+    best_results = []
+    best_degrees = []
+    best_p0 = []
+    
     # For each dataset
     for index in range(len(feature_df_list)):
+        best_deg_results = []
+        best_deg_difference = -1e-1000
+        
         # for degress
         for deg in range(4):
             # K fold
+            difference_list = []
+            best_difference = -1e-1000
+            
             for train_index, test_index in kf.split(feature_df_list[index]):
     
                 p0 = regression(deg, feature_df_list[index][train_index], target_df_list[index][train_index])
                 
                 prediction = calculate_poly_function(deg, feature_df_list[index][test_index], p0)
                 
-                print(p0)
-                print(prediction)
-                    
-                plt.figure()
-                plt.scatter(prediction, target_df_list[index][train_index], color ='g')
-                plt.title("Scatter plot of temp vs rentals")
-                plt.xlabel("temp")
-                plt.ylabel("rentals")
-                labels = ['casual', 'registered']
-                plt.legend(labels, loc="upper left", title="Rentals")
-        
-    
+                # print(np.mean(p0))
+                # print(np.mean(prediction))
+                difference = np.mean(prediction) - np.mean(p0)
+                # print(difference)
+                difference_list.append(difference)
                 
-                # Only do it for one of the datasets for testing
-                break
-            break
-        break
+                # break
+                
+            for i in range(len(difference_list)):
+                if best_difference < difference_list[i]:
+                    best_difference = difference_list[i]
+            # print(difference_list)
+            best_deg_results.append(best_difference)
+            # break
+            
+        for i in range(len(best_deg_results)):
+            if best_deg_difference < best_deg_results[i]:
+                best_deg_difference = best_deg_results[i]
+        print("Best Degree: ", best_deg_results.index(best_deg_difference))
+        # print(best_deg_results)
+        # print(best_deg_difference)
+        best_results.append(best_deg_difference)
+        best_degrees.append(best_deg_results.index(best_deg_difference))
+    
+    # print(best_results)
+    print("The best degrees for each dataset are: ", best_degrees)    
+    
+    
+    # Task 7
+    # plt.figure()
+    # plt.scatter(prediction, target_df_list[index][train_index], color ='g')
+    # plt.title("Scatter plot of temp vs rentals")
+    # plt.xlabel("temp")
+    # plt.ylabel("rentals")
+    # labels = ['casual', 'registered']
+    # plt.legend(labels, loc="upper left", title="Rentals")
     
 main()
