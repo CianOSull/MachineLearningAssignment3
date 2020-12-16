@@ -212,36 +212,26 @@ def main():
                 
                 prediction = calculate_poly_function(deg, feature_df_list[index][test_index], p0)
                 
-                # print(np.mean(p0))
-                # print(np.mean(prediction))
-                difference = np.mean(prediction) - np.mean(p0)
-                # print(difference)
+                # Find the mean difference between the price estimates and 
+                # difference = np.mean(prediction) - np.mean(p0)
+                difference = np.mean(target_df_list[index] - np.mean(prediction))
                 difference_list.append(difference)
                 p0_list.append(p0)
-                
-                # break
+
                 
             for i in range(len(difference_list)):
-                if best_difference < difference_list[i]:
+                if best_difference > difference_list[i]:
                     best_difference = difference_list[i]
-            # print(difference_list)
+                    
             best_deg_results.append(best_difference)
-            # print(p0_list)
-            # print(best_difference)
-            # print(p0_list[difference_list.index(best_difference)])
             best_p0_deg_results.append(p0_list[difference_list.index(best_difference)])
-            # print(best_p0_deg_results)
-            # break
             
         for i in range(len(best_deg_results)):
-            if best_deg_difference < best_deg_results[i]:
+            if best_deg_difference > best_deg_results[i]:
                 best_deg_difference = best_deg_results[i]
-        # print("Best Degree: ", best_deg_results.index(best_deg_difference))
-        # print(best_deg_results)
-        # print(best_deg_difference)
+                
         best_results.append(best_deg_difference)
         best_degrees.append(best_deg_results.index(best_deg_difference))
-        # p0_list[difference_list.index(best_difference)]
         best_p0.append(best_p0_deg_results[best_deg_results.index(best_deg_difference)])
     
     # print(best_results)
@@ -253,7 +243,9 @@ def main():
     # true prices on x axis
     # price estimates on y axis
     # If you plot this, they should be going along the diagonal
-# rather than all of the place
+    # rather than all of the place
+    plt.close("all")
+    
     for index in range(len(best_p0)):
         
         prediction = calculate_poly_function(best_degrees[index], feature_df_list[index], best_p0[index])
