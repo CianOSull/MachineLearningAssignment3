@@ -8,10 +8,7 @@ Created on Mon Dec  7 14:54:03 2020
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import datasets
-from sklearn import neural_network
 from sklearn import model_selection
-from sklearn import metrics
 
 # Task 1
 def Preprocess():
@@ -70,9 +67,9 @@ def Preprocess():
         
     return feature_array_list, target_array_list
 
-def num_coefficients_3(d):
+def num_coefficients_3(deg):
     t = 0
-    for n in range(d+1):
+    for n in range(deg+1):
         for i in range(n+1):
             for j in range(n+1):
                 for k in range(n+1):
@@ -80,20 +77,8 @@ def num_coefficients_3(d):
                         t = t+1
     return t
 
-def eval_poly_3(d,a,x,y,z):
-    r = 0
-    t = 0
-    for n in range(d+1):
-        for i in range(n+1):
-            for j in range(n+1):
-                for k in range(n+1):
-                    if i+j+k==n:
-                        r += a[t]*(x**i)*(y**j)*(z**k)
-                        t = t+1
-    return r
-
 # P is parameter vector
-def calculate_poly_function(deg, data, p):
+def calculate_poly_function(deg, data, parameter_vector):
     r = 0
     t = 0
     for n in range(deg+1):
@@ -101,10 +86,9 @@ def calculate_poly_function(deg, data, p):
             for j in range(n+1):
                 for k in range(n+1):
                     if i+j+k==n:
-                        r += p[t]*(data[:,0]**i)*(data[:,1]**j)*(data[:,2]**k)
+                        r += parameter_vector[t]*(data[:,0]**i)*(data[:,1]**j)*(data[:,2]**k)
                         t = t+1
     return r
-    
 
 def linearize(deg,data, p0):
     f0 = calculate_poly_function(deg,data,p0)
