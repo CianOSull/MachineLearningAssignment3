@@ -169,14 +169,13 @@ def calculate_update(y,f0,J):
     dp = np.linalg.solve(N,n)       
     return dp
 
-def regression(data, target):
+def regression(deg, data, target):
     max_iter = 10
-    for deg in range(4):
-        p0 = np.zeros(num_coefficients_3(deg))
-        for i in range(max_iter):
-            f0,J = linearize(deg,data, p0)
-            dp = calculate_update(target,f0,J)
-            p0 += dp
+    p0 = np.zeros(num_coefficients_3(deg))
+    for i in range(max_iter):
+        f0,J = linearize(deg,data, p0)
+        dp = calculate_update(target,f0,J)
+        p0 += dp
     
     return p0
 
@@ -196,27 +195,29 @@ def main():
     # For each dataset
     for index in range(len(feature_df_list)):
         # for degress
-        # K fold
-        for train_index, test_index in kf.split(feature_df_list[index]):
-
-            p0 = regression(feature_df_list[index][train_index], target_df_list[index][train_index])
-            
-            prediction = calculate_poly_function(3, feature_df_list[index][test_index], p0)
-            
-            print(p0)
-            print(prediction)
-                
-            plt.figure()
-            plt.scatter(prediction, target_df_list[index][train_index], color ='g')
-            plt.title("Scatter plot of temp vs rentals")
-            plt.xlabel("temp")
-            plt.ylabel("rentals")
-            labels = ['casual', 'registered']
-            plt.legend(labels, loc="upper left", title="Rentals")
+        for deg in range(4):
+            # K fold
+            for train_index, test_index in kf.split(feature_df_list[index]):
     
-
-            
-            # Only do it for one of the datasets for testing
+                p0 = regression(deg, feature_df_list[index][train_index], target_df_list[index][train_index])
+                
+                prediction = calculate_poly_function(deg, feature_df_list[index][test_index], p0)
+                
+                print(p0)
+                print(prediction)
+                    
+                plt.figure()
+                plt.scatter(prediction, target_df_list[index][train_index], color ='g')
+                plt.title("Scatter plot of temp vs rentals")
+                plt.xlabel("temp")
+                plt.ylabel("rentals")
+                labels = ['casual', 'registered']
+                plt.legend(labels, loc="upper left", title="Rentals")
+        
+    
+                
+                # Only do it for one of the datasets for testing
+                break
             break
         break
     
