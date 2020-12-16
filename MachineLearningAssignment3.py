@@ -13,35 +13,19 @@ from sklearn import neural_network
 from sklearn import model_selection
 from sklearn import metrics
 
-# carat
-# depth
-# table
-# selling price
-# assignment data points and features maybe?
-# Somehting about groups and then work on groups
-# Combinations is groups
-
-# two components are used in lab so it is binominal i think
-# degree in a univariete polynominal degree is teh highest d until you sum
-# basically the amount of numbers you sum think?
-# No using functions for polnominal functions in lab because 
-# librareis might need other stuff so we make our own
-# Look up coefficients from lectures because I have no idea why it exists
-
 # Task 1
 def Preprocess():
+    # Load the dataset
     diamonds_df = pd.read_csv("diamonds.csv")
     
     print("======================Task1======================")
+    
+    # Print some results from the dataset to get some information
     # print("Columns: ", diamonds_df.columns)
     # print(diamonds_df.head())
     # This is just a demonstration of how values can be used to make numpy arrays
     # print("Values: ", diamonds_df[['carat', 'depth', 'table']].values, type(diamonds_df[['carat', 'depth', 'table']].values))
     # print("Values: ", diamonds_df['price'].values, type(diamonds_df['price'].values))
-    
-    # Create a function that loads the file and extracts what 
-    # types of cut qualities [1 point], colour grades [1 point], 
-    # and clarity grades [1 point] are represented. 
     
     # List all the unique values of the cut column
     print("Cut: ", diamonds_df['cut'].unique())
@@ -52,22 +36,12 @@ def Preprocess():
     # List all the unique values of the clarity column
     print("Clarity: ", diamonds_df['clarity'].unique())
     
-    # For each combination of these cut, colour and clarity 
-    # grades extract the corresponding data-points [1 point].
-    # From now on all processing will be on these subsets 
-    # corresponding to the various different grades 
-    # (e.g. Machine Learning Assignment 3: Regression & 
-    # optimisation ('Ideal', 'E', 'VS2')). 
-    
     # This list contains the feature rows for each dataset    
-    feature_df_list = []
+    feature_array_list = []
     # This list contains the target rows for each dataset
-    target_df_list = []
+    target_array_list = []
     
-    # Create a loop going over all combinations of cut, colour,
-    # and clarity [1 point] and count the number of 
-    # data-points within each subset [1 point]. 
-    # This goes through each cut, color and clarity combinations
+    #
     for cut in diamonds_df['cut'].unique():
         for color in diamonds_df['color'].unique()   :
             for clarity in diamonds_df['clarity'].unique():
@@ -84,20 +58,17 @@ def Preprocess():
                 # Only print the datapoints with 801+ values (more than 800)
                 # Also add the combinations to the list
                 if (800 < len(df)):
-                    print(cut, " : ", color, " : ", clarity)
-                                        
-                    # Going grade-by-grade split the data-points into 
-                    # features [1 point] and targets [1 point]. 
-                    # Use the carat, depth and table value as 
-                    # features and the selling price as target.
-                    
+                    # Print hte combinations that were over 800
+                    print(cut, " : ", color, " : ", clarity)                    
                     # Extract columns
                     # df = df[['column', 'column']]
                     # Add the combinations to a list of all the dfs
-                    feature_df_list.append(df[['carat', 'depth', 'table']].values)
-                    target_df_list.append(df['price'].values)                
+                    # Create a list that contains the features for each dataset
+                    feature_array_list.append(df[['carat', 'depth', 'table']].values)
+                    # Crreate a list of targets for each dataset
+                    target_array_list.append(df['price'].values)                
         
-    return feature_df_list, target_df_list
+    return feature_array_list, target_array_list
 
 def num_coefficients_3(d):
     t = 0
@@ -167,10 +138,10 @@ def regression(deg, data, target):
 
 
 def main():
-    feature_df_list, target_df_list = Preprocess()
+    feature_array_list, target_array_list = Preprocess()
     
     # Task 2 on Wards
-    print("======================Task2-5======================")
+    print("======================Task2-6=====================")
     
     # Task 6
     # Create the k fold
@@ -182,7 +153,7 @@ def main():
     best_degrees = []   
     
     # For loop going through the datasets
-    for index in range(len(feature_df_list)):
+    for index in range(len(feature_array_list)):
         # Store the best degree for each results
         best_deg_results = []
         # Store the best p0 for each degree
@@ -200,16 +171,16 @@ def main():
             # This will store the best difference for deciding the best fold
             best_difference = -1e-1000
             
-            for train_index, test_index in kf.split(feature_df_list[index]):
+            for train_index, test_index in kf.split(feature_array_list[index]):
                 
                 # Call the regression function and create a model
-                p0 = regression(deg, feature_df_list[index][train_index], target_df_list[index][train_index])
+                p0 = regression(deg, feature_array_list[index][train_index], target_array_list[index][train_index])
                 
                 # Make predictions on teh test indexes
-                prediction = calculate_poly_function(deg, feature_df_list[index][test_index], p0)
+                prediction = calculate_poly_function(deg, feature_array_list[index][test_index], p0)
                 
                 # Find the mean difference between the price estimates and actual prices
-                difference = np.mean(target_df_list[index] - np.mean(prediction))
+                difference = np.mean(target_array_list[index] - np.mean(prediction))
                 
                 # Append the difference of each fold to the list
                 difference_list.append(difference)
@@ -250,11 +221,11 @@ def main():
     for index in range(len(best_p0)):
         
         # Make predictions on the all of the features diamonds
-        prediction = calculate_poly_function(best_degrees[index], feature_df_list[index], best_p0[index])
+        prediction = calculate_poly_function(best_degrees[index], feature_array_list[index], best_p0[index])
 
         plt.figure()
         # Make a scatter plot of true prices again price esitmates
-        plt.scatter(target_df_list[index], prediction, color ='g')
+        plt.scatter(target_array_list[index], prediction, color ='g')
         plt.title("True Prices and Estimated Prices for Dataset " + str(index+1))
         plt.xlabel("True Prices")
         plt.ylabel("Price Estimates")
