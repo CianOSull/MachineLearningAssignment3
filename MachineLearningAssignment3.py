@@ -164,7 +164,7 @@ def main():
                 prediction = calculate_poly_function(deg, feature_array_list[index][test_index], p0)
                 
                 # Find the mean difference between the price estimates and actual prices
-                difference = np.mean(target_array_list[index] - np.mean(prediction))
+                difference = abs(np.mean(target_array_list[index] - np.mean(prediction)))
                 
                 # Append the difference of each fold to the list
                 difference_list.append(difference)
