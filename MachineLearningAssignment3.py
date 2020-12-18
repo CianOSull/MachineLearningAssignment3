@@ -83,6 +83,7 @@ def num_coefficients_3(deg):
 # P is parameter vector
 # This is the polynomial function that creates the target 
 # vector using a multi-variate polynomial of the degree
+# It returns the estimated target vector
 def calculate_poly_function(deg, data, parameter_vector):
     r = 0
     t = 0
