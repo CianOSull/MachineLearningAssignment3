@@ -38,7 +38,7 @@ def Preprocess():
     # This list contains the target rows for each dataset
     target_array_list = []
     
-    #
+    # Go through all the unique values of the columns to get the combinations
     for cut in diamonds_df['cut'].unique():
         for color in diamonds_df['color'].unique()   :
             for clarity in diamonds_df['clarity'].unique():
