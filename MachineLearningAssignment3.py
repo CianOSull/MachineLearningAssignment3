@@ -8,10 +8,7 @@ Created on Mon Dec  7 14:54:03 2020
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import datasets
-from sklearn import neural_network
 from sklearn import model_selection
-from sklearn import metrics
 
 # Task 1
 def Preprocess():
@@ -41,7 +38,7 @@ def Preprocess():
     # This list contains the target rows for each dataset
     target_array_list = []
     
-    #
+    # Go through all the unique values of the columns to get the combinations
     for cut in diamonds_df['cut'].unique():
         for color in diamonds_df['color'].unique()   :
             for clarity in diamonds_df['clarity'].unique():
@@ -70,9 +67,11 @@ def Preprocess():
         
     return feature_array_list, target_array_list
 
-def num_coefficients_3(d):
+# Task 2
+# Determines the best size for the parameter vector for the degree
+def num_coefficients_3(deg):
     t = 0
-    for n in range(d+1):
+    for n in range(deg+1):
         for i in range(n+1):
             for j in range(n+1):
                 for k in range(n+1):
@@ -80,20 +79,12 @@ def num_coefficients_3(d):
                         t = t+1
     return t
 
-def eval_poly_3(d,a,x,y,z):
-    r = 0
-    t = 0
-    for n in range(d+1):
-        for i in range(n+1):
-            for j in range(n+1):
-                for k in range(n+1):
-                    if i+j+k==n:
-                        r += a[t]*(x**i)*(y**j)*(z**k)
-                        t = t+1
-    return r
-
+# Task 2
 # P is parameter vector
-def calculate_poly_function(deg, data, p):
+# This is the polynomial function that creates the target 
+# vector using a multi-variate polynomial of the degree
+# It returns the estimated target vector
+def calculate_poly_function(deg, data, parameter_vector):
     r = 0
     t = 0
     for n in range(deg+1):
@@ -101,11 +92,17 @@ def calculate_poly_function(deg, data, p):
             for j in range(n+1):
                 for k in range(n+1):
                     if i+j+k==n:
-                        r += p[t]*(data[:,0]**i)*(data[:,1]**j)*(data[:,2]**k)
+                        r += parameter_vector[t]*(data[:,0]**i)*(data[:,1]**j)*(data[:,2]**k)
                         t = t+1
     return r
-    
 
+# Task 3
+# f0 is the target vector 
+# J is the Jacobian matrix
+# This calcualtes the value of hte model funciton and its
+# Jacobian at a given linerizaiton point. 
+# It calcualtes the estiamted target vector and the estimated
+# jacobian at the linearization point
 def linearize(deg,data, p0):
     f0 = calculate_poly_function(deg,data,p0)
     J = np.zeros((len(f0), len(p0)))
@@ -117,7 +114,15 @@ def linearize(deg,data, p0):
         di = (fi - f0)/epsilon
         J[:,i] = di
     return f0,J
-    
+
+# Task 4    
+# y is the training target vector
+# f0 is the estiamted target vector
+# J is the jacobian matrix
+# It calcluates the optimal parameter update
+# from the trianing target vector and the estiamted
+# target vector and Jacobian.
+# It calculates the optimal parameter update vector as output.
 def calculate_update(y,f0,J):
     l=1e-2
     N = np.matmul(J.T,J) + l*np.eye(J.shape[1])
@@ -126,6 +131,10 @@ def calculate_update(y,f0,J):
     dp = np.linalg.solve(N,n)       
     return dp
 
+# Task 5
+# This funciton calculates the coefficent vector that best
+# fits tehtraining data. 
+# It returns the best fitting polynomial coefficient vector.
 def regression(deg, data, target):
     max_iter = 10
     p0 = np.zeros(num_coefficients_3(deg))
@@ -141,7 +150,7 @@ def main():
     feature_array_list, target_array_list = Preprocess()
     
     # Task 2 on Wards
-    print("======================Task2-6=====================")
+    print("======================Task6=====================")
     
     # Task 6
     # Create the k fold
@@ -180,7 +189,7 @@ def main():
                 prediction = calculate_poly_function(deg, feature_array_list[index][test_index], p0)
                 
                 # Find the mean difference between the price estimates and actual prices
-                difference = np.mean(target_array_list[index] - np.mean(prediction))
+                difference = abs(np.mean(target_array_list[index] - np.mean(prediction)))
                 
                 # Append the difference of each fold to the list
                 difference_list.append(difference)
@@ -226,7 +235,7 @@ def main():
         plt.figure()
         # Make a scatter plot of true prices again price esitmates
         plt.scatter(target_array_list[index], prediction, color ='g')
-        plt.title("True Prices and Estimated Prices for Dataset " + str(index+1))
+        plt.title("True Prices and Estimated Prices for Dataset " + str(index+1) + ", for degree: " + str(best_degrees[index]))
         plt.xlabel("True Prices")
         plt.ylabel("Price Estimates")
         labels = ['Prices']
